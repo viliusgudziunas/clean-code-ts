@@ -137,7 +137,18 @@ class Args {
           throw error;
         }
       } else if (this.isNumberArg(marshaler)) {
-        this.setNumberArg(marshaler);
+        if (this.currentParameter !== undefined) {
+          try {
+            this.setNumberArg(marshaler, this.currentParameter);
+          } catch (error) {
+            this.errorParameter = this.currentParameter;
+            this.errorCode = ErrorCode.INVALID_NUMBER;
+            throw error;
+          }
+        } else {
+          this.errorCode = ErrorCode.MISSING_ARGUMENT;
+          throw new ArgsException();
+        }
       }
     } catch (error) {
       this.valid = false;
@@ -160,19 +171,11 @@ class Args {
     return marshaler instanceof NumberArgumentMarshaler;
   }
 
-  private setNumberArg(marshaler: ArgumentMarshaler): void {
-    if (this.currentParameter !== undefined) {
-      try {
-        marshaler.set(this.currentParameter);
-      } catch (error) {
-        this.errorParameter = this.currentParameter;
-        this.errorCode = ErrorCode.INVALID_NUMBER;
-        throw error;
-      }
-    } else {
-      this.errorCode = ErrorCode.MISSING_ARGUMENT;
-      throw new ArgsException();
-    }
+  private setNumberArg(
+    marshaler: ArgumentMarshaler,
+    currentParameter: string
+  ): void {
+    marshaler.set(currentParameter);
   }
 
   get cardinality(): number {
