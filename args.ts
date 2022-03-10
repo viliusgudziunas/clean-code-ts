@@ -248,12 +248,12 @@ enum ErrorCode {
   UNEXPECTED_ARGUMENT,
 }
 
-abstract class ArgumentMarshaler {
-  abstract set(currentParameter: string): void;
-  abstract get(): Object;
+interface ArgumentMarshaler {
+  set(currentParameter: string): void;
+  get(): Object;
 }
 
-class BooleanArgumentMarshaler extends ArgumentMarshaler {
+class BooleanArgumentMarshaler implements ArgumentMarshaler {
   private booleanValue: boolean = false;
 
   set(_currentParameter: string): void {
@@ -265,7 +265,7 @@ class BooleanArgumentMarshaler extends ArgumentMarshaler {
   }
 }
 
-class StringArgumentMarshaler extends ArgumentMarshaler {
+class StringArgumentMarshaler implements ArgumentMarshaler {
   private stringValue: string = "";
 
   set(currentParameter: string): void {
@@ -281,7 +281,7 @@ class StringArgumentMarshaler extends ArgumentMarshaler {
   }
 }
 
-class NumberArgumentMarshaler extends ArgumentMarshaler {
+class NumberArgumentMarshaler implements ArgumentMarshaler {
   private numberValue: number = 0;
 
   set(currentParameter: string): void {
