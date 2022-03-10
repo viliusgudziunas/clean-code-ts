@@ -122,15 +122,17 @@ class Args {
 
   private setArgument(argChar: string): boolean {
     const marshaler = this.marshalers[argChar];
+    if (marshaler === undefined) {
+      return false;
+    }
+
     try {
       if (this.isBooleanArg(marshaler)) {
-        this.setBooleanArg(marshaler);
+        this.setBooleanArg(marshaler, this.currentParameter);
       } else if (this.isStringArg(marshaler)) {
         this.setStringArg(marshaler);
       } else if (this.isNumberArg(marshaler)) {
         this.setNumberArg(marshaler);
-      } else {
-        return false;
       }
     } catch (error) {
       this.valid = false;
@@ -153,12 +155,11 @@ class Args {
     return marshaler instanceof NumberArgumentMarshaler;
   }
 
-  private setBooleanArg(marshaler: ArgumentMarshaler): void {
-    try {
-      marshaler.set("true");
-    } catch (error) {
-      throw error;
-    }
+  private setBooleanArg(
+    marshaler: ArgumentMarshaler,
+    _currentParameter: string
+  ): void {
+    marshaler.set("true");
   }
 
   private setStringArg(marshaler: ArgumentMarshaler): void {
