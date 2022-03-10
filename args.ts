@@ -128,7 +128,7 @@ class Args {
 
     try {
       if (this.isBooleanArg(marshaler)) {
-        this.setBooleanArg(marshaler, this.currentParameter);
+        marshaler.set(this.currentParameter);
       } else if (this.isStringArg(marshaler)) {
         this.setStringArg(marshaler);
       } else if (this.isNumberArg(marshaler)) {
@@ -153,13 +153,6 @@ class Args {
 
   private isNumberArg(marshaler: ArgumentMarshaler): boolean {
     return marshaler instanceof NumberArgumentMarshaler;
-  }
-
-  private setBooleanArg(
-    marshaler: ArgumentMarshaler,
-    _currentParameter: string
-  ): void {
-    marshaler.set("true");
   }
 
   private setStringArg(marshaler: ArgumentMarshaler): void {
@@ -264,6 +257,7 @@ enum ErrorCode {
 }
 
 abstract class ArgumentMarshaler {
+  abstract set(currentParameter: string): void;
   abstract set(value: string): void;
   abstract get(): Object;
 }
@@ -271,7 +265,7 @@ abstract class ArgumentMarshaler {
 class BooleanArgumentMarshaler extends ArgumentMarshaler {
   private booleanValue: boolean = false;
 
-  set(_value: string): void {
+  set(_currentParameter: string): void {
     this.booleanValue = true;
   }
 
