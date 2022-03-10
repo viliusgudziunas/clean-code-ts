@@ -139,7 +139,7 @@ class Args {
       } else if (this.isNumberArg(marshaler)) {
         if (this.currentParameter !== undefined) {
           try {
-            this.setNumberArg(marshaler, this.currentParameter);
+            marshaler.set(this.currentParameter);
           } catch (error) {
             this.errorParameter = this.currentParameter;
             this.errorCode = ErrorCode.INVALID_NUMBER;
@@ -169,13 +169,6 @@ class Args {
 
   private isNumberArg(marshaler: ArgumentMarshaler): boolean {
     return marshaler instanceof NumberArgumentMarshaler;
-  }
-
-  private setNumberArg(
-    marshaler: ArgumentMarshaler,
-    currentParameter: string
-  ): void {
-    marshaler.set(currentParameter);
   }
 
   get cardinality(): number {
@@ -257,7 +250,6 @@ enum ErrorCode {
 
 abstract class ArgumentMarshaler {
   abstract set(currentParameter: string): void;
-  abstract set(value: string): void;
   abstract get(): Object;
 }
 
@@ -292,12 +284,12 @@ class StringArgumentMarshaler extends ArgumentMarshaler {
 class NumberArgumentMarshaler extends ArgumentMarshaler {
   private numberValue: number = 0;
 
-  set(value: string): void {
-    if (isNaN(Number(value))) {
+  set(currentParameter: string): void {
+    if (isNaN(Number(currentParameter))) {
       throw new ArgsException();
     }
 
-    this.numberValue = Number(value);
+    this.numberValue = Number(currentParameter);
   }
 
   get(): Object {
