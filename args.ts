@@ -130,7 +130,12 @@ class Args {
       if (this.isBooleanArg(marshaler)) {
         marshaler.set(this.currentParameter);
       } else if (this.isStringArg(marshaler)) {
-        this.setStringArg(marshaler);
+        try {
+          this.setStringArg(marshaler, this.currentParameter);
+        } catch (error) {
+          this.errorCode = ErrorCode.MISSING_ARGUMENT;
+          throw error;
+        }
       } else if (this.isNumberArg(marshaler)) {
         this.setNumberArg(marshaler);
       }
@@ -155,13 +160,11 @@ class Args {
     return marshaler instanceof NumberArgumentMarshaler;
   }
 
-  private setStringArg(marshaler: ArgumentMarshaler): void {
-    if (this.currentParameter !== undefined) {
-      marshaler.set(this.currentParameter);
-    } else {
-      this.errorCode = ErrorCode.MISSING_ARGUMENT;
-      throw new ArgsException();
-    }
+  private setStringArg(
+    marshaler: ArgumentMarshaler,
+    currentParameter: string
+  ): void {
+    marshaler.set(currentParameter);
   }
 
   private setNumberArg(marshaler: ArgumentMarshaler): void {
@@ -278,7 +281,11 @@ class StringArgumentMarshaler extends ArgumentMarshaler {
   private stringValue: string = "";
 
   set(value: string): void {
-    this.stringValue = value;
+    if (value !== undefined) {
+      this.stringValue = value;
+    } else {
+      throw new ArgsException();
+    }
   }
 
   get(): Object {
