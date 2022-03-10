@@ -5,7 +5,7 @@ class Args {
   private unexpectedArguments: Set<string> = new Set<string>();
   private marshalers: { [K: string]: ArgumentMarshaler } = {};
   private argsFound: Set<string> = new Set<string>();
-  private currentArgument: number = 0;
+  private currentParameter: string = "";
   private errorArgumentId: string = "\0";
   private errorParameter: string = "TILT";
   private errorCode: ErrorCode = ErrorCode.OK;
@@ -90,7 +90,7 @@ class Args {
 
   private parseArguments(): boolean {
     this.args.forEach((arg, index) => {
-      this.currentArgument = index;
+      this.currentParameter = this.args[index + 1];
       this.parseArgument(arg);
     });
 
@@ -162,10 +162,8 @@ class Args {
   }
 
   private setStringArg(marshaler: ArgumentMarshaler): void {
-    this.currentArgument++;
-
-    if (this.currentArgument < this.args.length) {
-      marshaler.set(this.args[this.currentArgument]);
+    if (this.currentParameter !== undefined) {
+      marshaler.set(this.currentParameter);
     } else {
       this.errorCode = ErrorCode.MISSING_ARGUMENT;
       throw new ArgsException();
@@ -173,14 +171,11 @@ class Args {
   }
 
   private setNumberArg(marshaler: ArgumentMarshaler): void {
-    this.currentArgument++;
-
-    if (this.currentArgument < this.args.length) {
-      const parameter = this.args[this.currentArgument];
+    if (this.currentParameter !== undefined) {
       try {
-        marshaler.set(parameter);
+        marshaler.set(this.currentParameter);
       } catch (error) {
-        this.errorParameter = parameter;
+        this.errorParameter = this.currentParameter;
         this.errorCode = ErrorCode.INVALID_NUMBER;
         throw error;
       }
