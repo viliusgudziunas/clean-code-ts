@@ -133,8 +133,10 @@ class Args {
     } catch (error) {
       this.valid = false;
       this.errorArgumentId = argChar;
-      this.errorCode = error.errorCode;
-      this.errorParameter = error.errorParameter;
+      if (error instanceof ArgsException) {
+        this.errorCode = error.code;
+        this.errorParameter = error.parameter;
+      }
       throw error;
     }
 
@@ -245,7 +247,7 @@ class StringArgumentMarshaler implements ArgumentMarshaler {
 
   set(currentParameter: string): void {
     if (currentParameter === undefined) {
-      throw new ArgsException(ErrorCode.MISSING_ARGUMENT);
+      throw new ArgsException({ code: ErrorCode.MISSING_ARGUMENT });
     }
 
     this.stringValue = currentParameter;
@@ -261,10 +263,13 @@ class NumberArgumentMarshaler implements ArgumentMarshaler {
 
   set(currentParameter: string): void {
     if (currentParameter === undefined) {
-      throw new ArgsException(ErrorCode.MISSING_ARGUMENT);
+      throw new ArgsException({ code: ErrorCode.MISSING_ARGUMENT });
     }
     if (isNaN(Number(currentParameter))) {
-      throw new ArgsException(ErrorCode.INVALID_NUMBER, currentParameter);
+      throw new ArgsException({
+        code: ErrorCode.INVALID_NUMBER,
+        parameter: currentParameter,
+      });
     }
 
     this.numberValue = Number(currentParameter);

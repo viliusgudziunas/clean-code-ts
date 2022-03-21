@@ -5,43 +5,54 @@ export enum ErrorCode {
   UNEXPECTED_ARGUMENT,
 }
 
-class ArgsException extends Error {
-  private errorCodeValue: ErrorCode;
-  private errorParameterValue: string;
-  private errorArgumentIdValue: string = "\0";
+export interface ArgsExceptionParams {
+  argumentId?: string;
+  code?: ErrorCode;
+  message?: string;
+  parameter?: string;
+}
 
-  constructor(
-    errorCode: ErrorCode = ErrorCode.OK,
-    errorParameter: string = "TILT",
-    errorArgumentId: string = "\0"
-  ) {
-    super();
+const argsExceptionDefaultParams: ArgsExceptionParams = {
+  argumentId: "\0",
+  code: ErrorCode.OK,
+  message: "",
+  parameter: "TILT",
+};
+
+class ArgsException extends Error {
+  private codeValue: ArgsExceptionParams["code"];
+  private parameterValue: ArgsExceptionParams["parameter"];
+  private argumentIdValue: ArgsExceptionParams["argumentId"];
+
+  constructor(params: ArgsExceptionParams = argsExceptionDefaultParams) {
+    super(params.message);
     // A way to make instanceof work for Error children
     Object.setPrototypeOf(this, ArgsException.prototype);
-    this.errorCode = errorCode;
-    this.errorParameter = errorParameter;
-    this.errorArgumentId = errorArgumentId;
+
+    this.code = params.code;
+    this.parameter = params.parameter;
+    this.argumentId = params.argumentId;
   }
 
-  get errorCode(): ErrorCode {
-    return this.errorCodeValue;
+  get code(): ArgsExceptionParams["code"] {
+    return this.codeValue;
   }
-  set errorCode(errorCode: ErrorCode) {
-    this.errorCodeValue = errorCode;
-  }
-
-  get errorParameter(): string | undefined {
-    return this.errorParameterValue;
-  }
-  set errorParameter(errorParameter: string) {
-    this.errorParameterValue = errorParameter;
+  set code(code: ArgsExceptionParams["code"]) {
+    this.codeValue = code;
   }
 
-  get errorArgumentId(): string {
-    return this.errorArgumentIdValue;
+  get parameter(): ArgsExceptionParams["parameter"] {
+    return this.parameterValue;
   }
-  set errorArgumentId(errorArgumentId: string) {
-    this.errorArgumentIdValue = errorArgumentId;
+  set parameter(parameter: ArgsExceptionParams["parameter"]) {
+    this.parameterValue = parameter;
+  }
+
+  get argumentId(): ArgsExceptionParams["argumentId"] {
+    return this.argumentIdValue;
+  }
+  set argumentId(argumentId: ArgsExceptionParams["argumentId"]) {
+    this.argumentIdValue = argumentId;
   }
 }
 
