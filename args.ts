@@ -130,29 +130,17 @@ class Args {
       if (this.isBooleanArg(marshaler)) {
         marshaler.set(this.currentParameter);
       } else if (this.isStringArg(marshaler)) {
-        try {
-          marshaler.set(this.currentParameter);
-        } catch (error) {
-          this.errorCode = ErrorCode.MISSING_ARGUMENT;
-          throw error;
-        }
+        marshaler.set(this.currentParameter);
       } else if (this.isNumberArg(marshaler)) {
-        if (this.currentParameter !== undefined) {
-          try {
-            marshaler.set(this.currentParameter);
-          } catch (error) {
-            this.errorParameter = this.currentParameter;
-            this.errorCode = ErrorCode.INVALID_NUMBER;
-            throw error;
-          }
-        } else {
-          this.errorCode = ErrorCode.MISSING_ARGUMENT;
-          throw new ArgsException();
-        }
+        marshaler.set(this.currentParameter);
       }
     } catch (error) {
       this.valid = false;
       this.errorArgumentId = argChar;
+      if (error instanceof ArgsException) {
+        this.errorCode = error.errorCode;
+        this.errorParameter = error.errorParameter;
+      }
       throw error;
     }
 
@@ -269,11 +257,11 @@ class StringArgumentMarshaler implements ArgumentMarshaler {
   private stringValue: string = "";
 
   set(currentParameter: string): void {
-    if (currentParameter !== undefined) {
-      this.stringValue = currentParameter;
-    } else {
-      throw new ArgsException();
+    if (currentParameter === undefined) {
+      throw new ArgsException(ErrorCode.MISSING_ARGUMENT);
     }
+
+    this.stringValue = currentParameter;
   }
 
   get(): Object {
@@ -285,8 +273,11 @@ class NumberArgumentMarshaler implements ArgumentMarshaler {
   private numberValue: number = 0;
 
   set(currentParameter: string): void {
+    if (currentParameter === undefined) {
+      throw new ArgsException(ErrorCode.MISSING_ARGUMENT);
+    }
     if (isNaN(Number(currentParameter))) {
-      throw new ArgsException();
+      throw new ArgsException(ErrorCode.INVALID_NUMBER, currentParameter);
     }
 
     this.numberValue = Number(currentParameter);
@@ -297,6 +288,34 @@ class NumberArgumentMarshaler implements ArgumentMarshaler {
   }
 }
 
-class ArgsException extends Error {}
+class ArgsException extends Error {
+  private errorCodeValue: ErrorCode;
+  private errorParameterValue: string;
+
+  constructor(
+    errorCode: ErrorCode = ErrorCode.OK,
+    errorParameter: string = undefined
+  ) {
+    super();
+    // A way to make instanceof work for Error children
+    Object.setPrototypeOf(this, ArgsException.prototype);
+    this.errorCode = errorCode;
+    this.errorParameter = errorParameter;
+  }
+
+  get errorCode(): ErrorCode {
+    return this.errorCodeValue;
+  }
+  set errorCode(errorCode: ErrorCode) {
+    this.errorCodeValue = errorCode;
+  }
+
+  get errorParameter(): string | undefined {
+    return this.errorParameterValue;
+  }
+  set errorParameter(errorParameter: string) {
+    this.errorParameterValue = errorParameter;
+  }
+}
 
 export default Args;
