@@ -93,13 +93,19 @@ describe("Args", () => {
   });
 
   describe(".getNumber()", () => {
-    it("should return number which was passed in after number argument when argument is in schema", () => {
-      const input = "-p 5000";
-      const arg: Args = new Args("p#", parseInput(input));
+    it.each<[number, number]>([
+      [5000, 5000],
+      [19.99, 19.99],
+    ])(
+      "should return %s when %s was passed in as argument and when argument is in schema",
+      (numberInput) => {
+        const input = `-p ${numberInput}`;
+        const arg: Args = new Args("p#", parseInput(input));
 
-      const number = arg.getNumber("p");
-      expect(number).toBe(5000);
-    });
+        const number = arg.getNumber("p");
+        expect(number).toBe(numberInput);
+      }
+    );
 
     it.each<string>(["-l hello.txt -p", "hello.txt -p"])(
       "should return 0 when input is %p and argument is in schema",
