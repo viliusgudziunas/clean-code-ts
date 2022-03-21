@@ -52,17 +52,17 @@ class Args {
     } else if (this.isNumberSchemaElement(elementTail)) {
       this.parseNumberSchemaElement(elementId);
     } else {
-      throw new Error(
-        `Argument: ${elementId} has invalid format: ${elementTail}`
-      );
+      throw new ArgsException({
+        message: `Argument: ${elementId} has invalid format: ${elementTail}`,
+      });
     }
   }
 
   private validateSchemaElementId(elementId: string): void {
     if (!elementId.match(/[a-z]/i)) {
-      throw new Error(
-        `Bad character: ${elementId} in Args format: ${this.schema}`
-      );
+      throw new ArgsException({
+        message: `Bad character: ${elementId} in Args format: ${this.schema}`,
+      });
     }
   }
 
@@ -170,7 +170,7 @@ class Args {
   get errorMessage(): string {
     switch (this.errorCode) {
       case ErrorCode.OK:
-        throw new Error("TILT: Should not get here.");
+        throw new ArgsException({ message: "TILT: Should not get here." });
       case ErrorCode.UNEXPECTED_ARGUMENT:
         return this.unexpectedArgumentMessage();
       case ErrorCode.MISSING_ARGUMENT:
