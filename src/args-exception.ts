@@ -8,16 +8,19 @@ export enum ErrorCode {
 class ArgsException extends Error {
   private errorCodeValue: ErrorCode;
   private errorParameterValue: string;
+  private errorArgumentIdValue: string = "\0";
 
   constructor(
     errorCode: ErrorCode = ErrorCode.OK,
-    errorParameter: string = undefined
+    errorParameter: string = "TILT",
+    errorArgumentId: string = "\0"
   ) {
     super();
     // A way to make instanceof work for Error children
     Object.setPrototypeOf(this, ArgsException.prototype);
     this.errorCode = errorCode;
     this.errorParameter = errorParameter;
+    this.errorArgumentId = errorArgumentId;
   }
 
   get errorCode(): ErrorCode {
@@ -32,6 +35,13 @@ class ArgsException extends Error {
   }
   set errorParameter(errorParameter: string) {
     this.errorParameterValue = errorParameter;
+  }
+
+  get errorArgumentId(): string {
+    return this.errorArgumentIdValue;
+  }
+  set errorArgumentId(errorArgumentId: string) {
+    this.errorArgumentIdValue = errorArgumentId;
   }
 }
 
