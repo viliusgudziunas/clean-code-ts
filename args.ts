@@ -127,20 +127,12 @@ class Args {
     }
 
     try {
-      if (this.isBooleanArg(marshaler)) {
-        marshaler.set(this.currentParameter);
-      } else if (this.isStringArg(marshaler)) {
-        marshaler.set(this.currentParameter);
-      } else if (this.isNumberArg(marshaler)) {
-        marshaler.set(this.currentParameter);
-      }
+      marshaler.set(this.currentParameter);
     } catch (error) {
       this.valid = false;
       this.errorArgumentId = argChar;
-      if (error instanceof ArgsException) {
-        this.errorCode = error.errorCode;
-        this.errorParameter = error.errorParameter;
-      }
+      this.errorCode = error.errorCode;
+      this.errorParameter = error.errorParameter;
       throw error;
     }
 
