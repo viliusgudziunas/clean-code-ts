@@ -39,14 +39,6 @@ describe("Args", () => {
       expect(boolean).toBe(false);
     });
 
-    it("should return false when argument is not in schema", () => {
-      const input = "-k";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const boolean = arg.getBoolean("k");
-      expect(boolean).toBe(false);
-    });
-
     it("should return false when calling with a non-boolean argument", () => {
       const input = "-k -p 5000";
       const arg: Args = new Args("k,p#", parseInput(input));
@@ -63,24 +55,6 @@ describe("Args", () => {
 
       const string = arg.getString("f");
       expect(string).toBe("hello.txt");
-    });
-
-    it.each<string>(["-l hello.txt -f", "hello.txt -f"])(
-      "should return empty string when input is %p and argument is in schema",
-      (input) => {
-        const arg: Args = new Args("f*", parseInput(input));
-
-        const string = arg.getString("f");
-        expect(string).toBe("");
-      }
-    );
-
-    it("should return empty string when argument is not in schema", () => {
-      const input = "-f hello.txt";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const string = arg.getString("f");
-      expect(string).toBe("");
     });
 
     it("should return empty string when calling with a non-string argument", () => {
@@ -106,32 +80,6 @@ describe("Args", () => {
         expect(number).toBe(numberInput);
       }
     );
-
-    it.each<string>(["-l hello.txt -p", "hello.txt -p"])(
-      "should return 0 when input is %p and argument is in schema",
-      (input) => {
-        const arg: Args = new Args("p#", parseInput(input));
-
-        const number = arg.getNumber("p");
-        expect(number).toBe(0);
-      }
-    );
-
-    it("should return 0 when argument is not in schema", () => {
-      const input = "-p 5000";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const number = arg.getNumber("p");
-      expect(number).toBe(0);
-    });
-
-    it("should return 0 when parameter is not a valid number", () => {
-      const input = "-p hello";
-      const arg: Args = new Args("p#", parseInput(input));
-
-      const number = arg.getNumber("p");
-      expect(number).toBe(0);
-    });
 
     it("should return 0 when calling with a non-number argument", () => {
       const input = "-k -p 5000";
@@ -163,60 +111,26 @@ describe("Args", () => {
 
     it("should return false when argument was not found in schema", () => {
       const input = "-f";
-      const arg: Args = new Args("l", parseInput(input));
+      const arg: Args = new Args("f", parseInput(input));
 
-      const hasArgument = arg.has("f");
+      const hasArgument = arg.has("l");
       expect(hasArgument).toBe(false);
     });
 
     it("should return false when argument was not found in arguments", () => {
       const input = "-f";
-      const arg: Args = new Args("l", parseInput(input));
+      const arg: Args = new Args("f,l", parseInput(input));
 
       const hasArgument = arg.has("l");
       expect(hasArgument).toBe(false);
     });
 
     it("should return false when argument was not found in schema and arguments", () => {
-      const input = "-f";
-      const arg: Args = new Args("l", parseInput(input));
+      const input = "-f -l";
+      const arg: Args = new Args("f,l", parseInput(input));
 
       const hasArgument = arg.has("k");
       expect(hasArgument).toBe(false);
-    });
-  });
-
-  describe(".isValid", () => {
-    it("should return true when no schema and no input was passed in", () => {
-      const input = "";
-      const arg: Args = new Args("", parseInput(input));
-
-      const valid = arg.isValid;
-      expect(valid).toBe(true);
-    });
-
-    it("should return true when valid input was passed in", () => {
-      const input = "-l";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const valid = arg.isValid;
-      expect(valid).toBe(true);
-    });
-
-    it("should return true when empty input was passed in", () => {
-      const input = "";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const valid = arg.isValid;
-      expect(valid).toBe(true);
-    });
-
-    it("should return false when invalid input was passed in", () => {
-      const input = "-d";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const valid = arg.isValid;
-      expect(valid).toBe(false);
     });
   });
 
@@ -242,14 +156,6 @@ describe("Args", () => {
         expect(cardinality).toBe(numberOfArguments);
       }
     );
-
-    it("should ignore invalid arguments", () => {
-      const input = "-l -d";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const cardinality = arg.cardinality;
-      expect(cardinality).toBe(1);
-    });
   });
 
   describe(".usage", () => {
@@ -260,13 +166,66 @@ describe("Args", () => {
       const usage = arg.usage;
       expect(usage).toBe("[l]");
     });
-
-    it("should return empty string when schema an empty string", () => {
-      const input = "-l";
-      const arg: Args = new Args("", parseInput(input));
-
-      const usage = arg.usage;
-      expect(usage).toBe("");
-    });
   });
+
+  // describe("exceptions", () => {
+  // it("should return false when argument is not in schema", () => {
+  //   const input = "-k";
+  //   const arg: Args = new Args("l", parseInput(input));
+
+  //   const boolean = arg.getBoolean("k");
+  //   expect(boolean).toBe(false);
+  // });
+  // it.each<string>(["-l hello.txt -f", "hello.txt -f"])(
+  //   "should return empty string when input is %p and argument is in schema",
+  //   (input) => {
+  //     const arg: Args = new Args("f*", parseInput(input));
+
+  //     const string = arg.getString("f");
+  //     expect(string).toBe("");
+  //   }
+  // );
+  // it("should return empty string when argument is not in schema", () => {
+  //   const input = "-f hello.txt";
+  //   const arg: Args = new Args("l", parseInput(input));
+
+  //   const string = arg.getString("f");
+  //   expect(string).toBe("");
+  // });
+  // it.each<string>(["-l hello.txt -p", "hello.txt -p"])(
+  //   "should return 0 when input is %p and argument is in schema",
+  //   (input) => {
+  //     const arg: Args = new Args("p#", parseInput(input));
+
+  //     const number = arg.getNumber("p");
+  //     expect(number).toBe(0);
+  //   }
+  // );
+  // it("should return 0 when argument is not in schema", () => {
+  //   const input = "-p 5000";
+  //   const arg: Args = new Args("l", parseInput(input));
+
+  //   const number = arg.getNumber("p");
+  //   expect(number).toBe(0);
+  // });
+  // it("should return 0 when parameter is not a valid number", () => {
+  //   const input = "-p hello";
+  //   const arg: Args = new Args("p#", parseInput(input));
+
+  //   const number = arg.getNumber("p");
+  //   expect(number).toBe(0);
+  // });
+  // it("should ignore invalid arguments", () => {
+  //   const input = "-l -d";
+  //   const arg: Args = new Args("l", parseInput(input));
+  //   const cardinality = arg.cardinality;
+  //   expect(cardinality).toBe(1);
+  // });
+  // it("should return empty string when schema an empty string", () => {
+  //   const input = "-l";
+  //   const arg: Args = new Args("", parseInput(input));
+  //   const usage = arg.usage;
+  //   expect(usage).toBe("");
+  // });
+  // });
 });

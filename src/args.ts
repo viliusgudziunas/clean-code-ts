@@ -3,7 +3,6 @@ import ArgsException, { ErrorCode } from "./args-exception";
 class Args {
   private schema: string;
   private args: string[];
-  private valid: boolean = true;
   private marshalers: { [K: string]: ArgumentMarshaler } = {};
   private argsFound: Set<string> = new Set<string>();
   private currentParameter: string = "";
@@ -11,29 +10,19 @@ class Args {
   constructor(schema: string, args: string[]) {
     this.schema = schema;
     this.args = args;
-    this.valid = this.parse();
+    this.parse();
   }
 
-  private parse(): boolean {
-    if (this.schema.length === 0 && this.args.length === 0) {
-      return true;
-    }
-
+  private parse(): void {
     this.parseSchema();
-    try {
-      this.parseArguments();
-    } catch (error) {}
-
-    return this.valid;
+    this.parseArguments();
   }
 
-  private parseSchema(): boolean {
+  private parseSchema(): void {
     this.schema
       .split(",")
       .filter((element) => element.length > 0)
       .forEach((element) => this.parseSchemaElement(element.trim()));
-
-    return true;
   }
 
   private parseSchemaElement(element: string): void {
@@ -86,13 +75,11 @@ class Args {
     this.marshalers[elementId] = new NumberArgumentMarshaler();
   }
 
-  private parseArguments(): boolean {
+  private parseArguments(): void {
     this.args.forEach((arg, index) => {
       this.currentParameter = this.args[index + 1];
       this.parseArgument(arg);
     });
-
-    return true;
   }
 
   private parseArgument(arg: string): void {
@@ -112,7 +99,6 @@ class Args {
     if (this.setArgument(argChar)) {
       this.argsFound.add(argChar);
     } else {
-      this.valid = false;
       throw new ArgsException({
         code: ErrorCode.UNEXPECTED_ARGUMENT,
         argumentId: argChar,
@@ -129,7 +115,6 @@ class Args {
     try {
       marshaler.set(this.currentParameter);
     } catch (error) {
-      this.valid = false;
       if (error instanceof ArgsException) {
         error.argumentId = argChar;
       }
@@ -192,10 +177,6 @@ class Args {
 
   has(arg: string): boolean {
     return this.argsFound.has(arg);
-  }
-
-  get isValid(): boolean {
-    return this.valid;
   }
 }
 
