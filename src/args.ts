@@ -19,10 +19,21 @@ class Args {
   }
 
   private parseSchema(): void {
+    this.validateSchema();
+
     this.schema
       .split(",")
       .filter((element) => element.length > 0)
       .forEach((element) => this.parseSchemaElement(element.trim()));
+  }
+
+  private validateSchema(): void {
+    if (this.schema === "") {
+      throw new ArgsException({
+        code: ErrorCode.INVALID_SCHEMA,
+        argumentId: this.schema,
+      });
+    }
   }
 
   private parseSchemaElement(element: string): void {
@@ -38,7 +49,9 @@ class Args {
       this.parseNumberSchemaElement(elementId);
     } else {
       throw new ArgsException({
-        message: `Argument: ${elementId} has invalid format: ${elementTail}`,
+        code: ErrorCode.INVALID_FORMAT,
+        argumentId: elementId,
+        parameter: elementTail,
       });
     }
   }

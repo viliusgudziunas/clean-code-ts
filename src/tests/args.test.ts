@@ -1,4 +1,5 @@
 import Args from "../args";
+import { ErrorCode } from "../args-exception";
 import { parseInput } from "./test-utils";
 
 describe("Args", () => {
@@ -9,15 +10,6 @@ describe("Args", () => {
       expect(() => new Args("1", parseInput(input))).toThrowError(Error);
       expect(() => new Args("1", parseInput(input))).toThrowError(
         "Bad character: 1 in Args format: 1"
-      );
-    });
-
-    it("should throw invalid format error if schema has unsupported arguments", () => {
-      const input = "-l";
-
-      expect(() => new Args("lg", parseInput(input))).toThrowError(Error);
-      expect(() => new Args("lg", parseInput(input))).toThrowError(
-        "Argument: l has invalid format: g"
       );
     });
   });
@@ -168,64 +160,80 @@ describe("Args", () => {
     });
   });
 
-  // describe("exceptions", () => {
-  // it("should return false when argument is not in schema", () => {
-  //   const input = "-k";
-  //   const arg: Args = new Args("l", parseInput(input));
+  describe("exceptions", () => {
+    it("should throw INVALID_FORMAT error if schema has unsupported arguments", () => {
+      const input = "-l";
 
-  //   const boolean = arg.getBoolean("k");
-  //   expect(boolean).toBe(false);
-  // });
-  // it.each<string>(["-l hello.txt -f", "hello.txt -f"])(
-  //   "should return empty string when input is %p and argument is in schema",
-  //   (input) => {
-  //     const arg: Args = new Args("f*", parseInput(input));
+      expect(() => new Args("lg", parseInput(input))).toThrowError(Error);
+      try {
+        new Args("lg", parseInput(input));
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.INVALID_FORMAT);
+      }
+    });
 
-  //     const string = arg.getString("f");
-  //     expect(string).toBe("");
-  //   }
-  // );
-  // it("should return empty string when argument is not in schema", () => {
-  //   const input = "-f hello.txt";
-  //   const arg: Args = new Args("l", parseInput(input));
+    it("should throw INVALID_SCHEMA error if schema is empty", () => {
+      const input = "-l";
 
-  //   const string = arg.getString("f");
-  //   expect(string).toBe("");
-  // });
-  // it.each<string>(["-l hello.txt -p", "hello.txt -p"])(
-  //   "should return 0 when input is %p and argument is in schema",
-  //   (input) => {
-  //     const arg: Args = new Args("p#", parseInput(input));
+      expect(() => new Args("", parseInput(input))).toThrowError(Error);
+      try {
+        new Args("", parseInput(input));
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.INVALID_SCHEMA);
+      }
+    });
 
-  //     const number = arg.getNumber("p");
-  //     expect(number).toBe(0);
-  //   }
-  // );
-  // it("should return 0 when argument is not in schema", () => {
-  //   const input = "-p 5000";
-  //   const arg: Args = new Args("l", parseInput(input));
+    // it("should return false when argument is not in schema", () => {
+    //   const input = "-k";
+    //   const arg: Args = new Args("l", parseInput(input));
 
-  //   const number = arg.getNumber("p");
-  //   expect(number).toBe(0);
-  // });
-  // it("should return 0 when parameter is not a valid number", () => {
-  //   const input = "-p hello";
-  //   const arg: Args = new Args("p#", parseInput(input));
+    //   const boolean = arg.getBoolean("k");
+    //   expect(boolean).toBe(false);
+    // });
+    // it.each<string>(["-l hello.txt -f", "hello.txt -f"])(
+    //   "should return empty string when input is %p and argument is in schema",
+    //   (input) => {
+    //     const arg: Args = new Args("f*", parseInput(input));
 
-  //   const number = arg.getNumber("p");
-  //   expect(number).toBe(0);
-  // });
-  // it("should ignore invalid arguments", () => {
-  //   const input = "-l -d";
-  //   const arg: Args = new Args("l", parseInput(input));
-  //   const cardinality = arg.cardinality;
-  //   expect(cardinality).toBe(1);
-  // });
-  // it("should return empty string when schema an empty string", () => {
-  //   const input = "-l";
-  //   const arg: Args = new Args("", parseInput(input));
-  //   const usage = arg.usage;
-  //   expect(usage).toBe("");
-  // });
-  // });
+    //     const string = arg.getString("f");
+    //     expect(string).toBe("");
+    //   }
+    // );
+    // it("should return empty string when argument is not in schema", () => {
+    //   const input = "-f hello.txt";
+    //   const arg: Args = new Args("l", parseInput(input));
+
+    //   const string = arg.getString("f");
+    //   expect(string).toBe("");
+    // });
+    // it.each<string>(["-l hello.txt -p", "hello.txt -p"])(
+    //   "should return 0 when input is %p and argument is in schema",
+    //   (input) => {
+    //     const arg: Args = new Args("p#", parseInput(input));
+
+    //     const number = arg.getNumber("p");
+    //     expect(number).toBe(0);
+    //   }
+    // );
+    // it("should return 0 when argument is not in schema", () => {
+    //   const input = "-p 5000";
+    //   const arg: Args = new Args("l", parseInput(input));
+
+    //   const number = arg.getNumber("p");
+    //   expect(number).toBe(0);
+    // });
+    // it("should return 0 when parameter is not a valid number", () => {
+    //   const input = "-p hello";
+    //   const arg: Args = new Args("p#", parseInput(input));
+
+    //   const number = arg.getNumber("p");
+    //   expect(number).toBe(0);
+    // });
+    // it("should ignore invalid arguments", () => {
+    //   const input = "-l -d";
+    //   const arg: Args = new Args("l", parseInput(input));
+    //   const cardinality = arg.cardinality;
+    //   expect(cardinality).toBe(1);
+    // });
+  });
 });

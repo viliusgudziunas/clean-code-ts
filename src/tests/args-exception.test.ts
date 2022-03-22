@@ -127,7 +127,59 @@ describe("ArgsException", () => {
       );
     });
 
-    it("should return default argumentId when code is UNEXPECTED_ARGUMENT, but no argument was passed in", () => {
+    it("should return default argumentId when code is INVALID_SCHEMA, but no argumentId was passed in", () => {
+      const exception = new ArgsException({ code: ErrorCode.INVALID_SCHEMA });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Schema '\0' is invalid.");
+    });
+
+    it("should return argumentId when code is INVALID_SCHEMA and argumentId was passed in via constructor", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.INVALID_SCHEMA,
+        argumentId: "schema",
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Schema 'schema' is invalid.");
+    });
+
+    it("should return argumentId when code is INVALID_SCHEMA and argumentId was passed in via setters", () => {
+      const exception = new ArgsException({ code: ErrorCode.INVALID_SCHEMA });
+      exception.argumentId = "test";
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Schema 'test' is invalid.");
+    });
+
+    it("should return default argumentId and parameter when code is INVALID_FORMAT, but no argumentId and parameter were passed in", () => {
+      const exception = new ArgsException({ code: ErrorCode.INVALID_FORMAT });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-\0' has invalid format 'TILT'.");
+    });
+
+    it("should return argumentId and parameter when code is INVALID_FORMAT and argumentId and parameter were passed in via constructor", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.INVALID_FORMAT,
+        argumentId: "a",
+        parameter: "param",
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-a' has invalid format 'param'.");
+    });
+
+    it("should return argumentId and parameter when code is INVALID_FORMAT and argumentId and parameter were passed in via setters", () => {
+      const exception = new ArgsException({ code: ErrorCode.INVALID_FORMAT });
+      exception.argumentId = "b";
+      exception.parameter = "test";
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-b' has invalid format 'test'.");
+    });
+
+    it("should return default argumentId when code is UNEXPECTED_ARGUMENT, but no argumentId was passed in", () => {
       const exception = new ArgsException({
         code: ErrorCode.UNEXPECTED_ARGUMENT,
       });
@@ -156,7 +208,7 @@ describe("ArgsException", () => {
       expect(errorMessage).toBe("Argument '-b' unexpected.");
     });
 
-    it("should return default argumentId when code is MISSING_ARGUMENT, but no argument was passed in", () => {
+    it("should return default argumentId when code is MISSING_ARGUMENT, but no argumentId was passed in", () => {
       const exception = new ArgsException({ code: ErrorCode.MISSING_ARGUMENT });
 
       const errorMessage = exception.errorMessage;
@@ -181,7 +233,7 @@ describe("ArgsException", () => {
       expect(errorMessage).toBe("Could not find parameter for '-b'.");
     });
 
-    it("should return default argumentId and parameter when code is INVALID_NUMBER, but no argument and no parameter were passed in", () => {
+    it("should return default argumentId and parameter when code is INVALID_NUMBER, but no argumentId and no parameter were passed in", () => {
       const exception = new ArgsException({ code: ErrorCode.INVALID_NUMBER });
 
       const errorMessage = exception.errorMessage;

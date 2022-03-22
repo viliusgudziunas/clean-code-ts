@@ -1,5 +1,7 @@
 export enum ErrorCode {
+  INVALID_FORMAT,
   INVALID_NUMBER,
+  INVALID_SCHEMA,
   MISSING_ARGUMENT,
   OK,
   UNEXPECTED_ARGUMENT,
@@ -60,6 +62,10 @@ class ArgsException extends Error {
     switch (this.code) {
       case ErrorCode.OK:
         throw new Error("TILT: Should not get here.");
+      case ErrorCode.INVALID_SCHEMA:
+        return `Schema '${this.argumentId}' is invalid.`;
+      case ErrorCode.INVALID_FORMAT:
+        return `Argument '-${this.argumentId}' has invalid format '${this.parameter}'.`;
       case ErrorCode.UNEXPECTED_ARGUMENT:
         return `Argument '-${this.argumentId}' unexpected.`;
       case ErrorCode.MISSING_ARGUMENT:
