@@ -116,4 +116,102 @@ describe("ArgsException", () => {
       expect(errorArgumentId).toBe("b");
     });
   });
+
+  describe(".errorMessage", () => {
+    it("should throw TILT error when error code is OK", () => {
+      const exception = new ArgsException();
+
+      expect(() => exception.errorMessage).toThrowError(Error);
+      expect(() => exception.errorMessage).toThrowError(
+        "TILT: Should not get here."
+      );
+    });
+
+    it("should return default argumentId when code is UNEXPECTED_ARGUMENT, but no argument was passed in", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.UNEXPECTED_ARGUMENT,
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-\0' unexpected.");
+    });
+
+    it("should return argumentId when code is UNEXPECTED_ARGUMENT and argumentId was passed in via constructor", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.UNEXPECTED_ARGUMENT,
+        argumentId: "a",
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-a' unexpected.");
+    });
+
+    it("should return argumentId when code is UNEXPECTED_ARGUMENT and argumentId was passed in via setter", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.UNEXPECTED_ARGUMENT,
+      });
+      exception.argumentId = "b";
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-b' unexpected.");
+    });
+
+    it("should return default argumentId when code is MISSING_ARGUMENT, but no argument was passed in", () => {
+      const exception = new ArgsException({ code: ErrorCode.MISSING_ARGUMENT });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Could not find parameter for '-\0'.");
+    });
+
+    it("should return argumentId when code is MISSING_ARGUMENT and argumentId was passed in via constructor", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.MISSING_ARGUMENT,
+        argumentId: "a",
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Could not find parameter for '-a'.");
+    });
+
+    it("should return argumentId when code is MISSING_ARGUMENT and argumentId was passed in via setter", () => {
+      const exception = new ArgsException({ code: ErrorCode.MISSING_ARGUMENT });
+      exception.argumentId = "b";
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Could not find parameter for '-b'.");
+    });
+
+    it("should return default argumentId and parameter when code is INVALID_NUMBER, but no argument and no parameter were passed in", () => {
+      const exception = new ArgsException({ code: ErrorCode.INVALID_NUMBER });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe(
+        "Found invalid number parameter 'TILT' for '-\0'."
+      );
+    });
+
+    it("should return argumentId and parameter when code is INVALID_NUMBER and argumentId and parameter were passed in via constructor", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.INVALID_NUMBER,
+        argumentId: "a",
+        parameter: "hey",
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe(
+        "Found invalid number parameter 'hey' for '-a'."
+      );
+    });
+
+    it("should return argumentId and parameter when code is INVALID_NUMBER and argumentId and parameter were passed in via setters", () => {
+      const exception = new ArgsException({ code: ErrorCode.INVALID_NUMBER });
+      exception.argumentId = "b";
+      exception.parameter = "test";
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe(
+        "Found invalid number parameter 'test' for '-b'."
+      );
+    });
+  });
 });

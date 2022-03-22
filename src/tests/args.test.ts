@@ -269,45 +269,4 @@ describe("Args", () => {
       expect(usage).toBe("");
     });
   });
-
-  describe(".errorMessage", () => {
-    it("should throw TILT error when all arguments are valid", () => {
-      const input = "-l";
-      const arg: Args = new Args("l", parseInput(input));
-
-      expect(() => arg.errorMessage).toThrowError(Error);
-      expect(() => arg.errorMessage).toThrowError("TILT: Should not get here.");
-    });
-
-    it.each<[string, string]>([
-      ["d", "-l -d"],
-      ["p", "-l -p"],
-    ])(
-      "should return %p argument not found error message when input is %p",
-      (missingArgument, input) => {
-        const arg: Args = new Args("l,d*,p#", parseInput(input));
-
-        const errorMessage = arg.errorMessage;
-        expect(errorMessage).toBe(
-          `Could not find parameter for -${missingArgument}.`
-        );
-      }
-    );
-
-    it("should return unexpected argument message when input arguments are not in schema", () => {
-      const input = "-l -q";
-      const arg: Args = new Args("l", parseInput(input));
-
-      const errorMessage = arg.errorMessage;
-      expect(errorMessage).toBe("Argument(s) -q unexpected.");
-    });
-
-    it("should return invalid number argument when number argument is not a valid number", () => {
-      const input = "-p hello";
-      const arg: Args = new Args("p#", parseInput(input));
-
-      const errorMessage = arg.errorMessage;
-      expect(errorMessage).toBe("Found invalid number parameter hello for -p.");
-    });
-  });
 });

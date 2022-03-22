@@ -167,28 +167,6 @@ class Args {
     }
   }
 
-  get errorMessage(): string {
-    switch (this.errorCode) {
-      case ErrorCode.OK:
-        throw new ArgsException({ message: "TILT: Should not get here." });
-      case ErrorCode.UNEXPECTED_ARGUMENT:
-        return this.unexpectedArgumentMessage();
-      case ErrorCode.MISSING_ARGUMENT:
-        return `Could not find parameter for -${this.errorArgumentId}.`;
-      case ErrorCode.INVALID_NUMBER:
-        return `Found invalid number parameter ${this.errorParameter} for -${this.errorArgumentId}.`;
-      default:
-        return "";
-    }
-  }
-
-  private unexpectedArgumentMessage(): string {
-    let message = "Argument(s) ";
-    this.unexpectedArguments.forEach((arg) => (message += `-${arg} `));
-    message += "unexpected.";
-    return message;
-  }
-
   getBoolean(arg: string): boolean {
     const marshaler = this.marshalers[arg];
     if (marshaler !== undefined && this.isBooleanArg(marshaler)) {
