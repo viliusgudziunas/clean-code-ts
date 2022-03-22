@@ -4,13 +4,9 @@ class Args {
   private schema: string;
   private args: string[];
   private valid: boolean = true;
-  private unexpectedArguments: Set<string> = new Set<string>();
   private marshalers: { [K: string]: ArgumentMarshaler } = {};
   private argsFound: Set<string> = new Set<string>();
   private currentParameter: string = "";
-  private errorArgumentId: string = "\0";
-  private errorParameter: string = "TILT";
-  private errorCode: ErrorCode = ErrorCode.OK;
 
   constructor(schema: string, args: string[]) {
     this.schema = schema;
@@ -116,9 +112,11 @@ class Args {
     if (this.setArgument(argChar)) {
       this.argsFound.add(argChar);
     } else {
-      this.unexpectedArguments.add(argChar);
-      this.errorCode = ErrorCode.UNEXPECTED_ARGUMENT;
       this.valid = false;
+      throw new ArgsException({
+        code: ErrorCode.UNEXPECTED_ARGUMENT,
+        argumentId: argChar,
+      });
     }
   }
 
@@ -132,10 +130,8 @@ class Args {
       marshaler.set(this.currentParameter);
     } catch (error) {
       this.valid = false;
-      this.errorArgumentId = argChar;
       if (error instanceof ArgsException) {
-        this.errorCode = error.code;
-        this.errorParameter = error.parameter;
+        error.argumentId = argChar;
       }
       throw error;
     }
