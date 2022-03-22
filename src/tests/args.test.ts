@@ -195,16 +195,17 @@ describe("Args", () => {
       }
     );
 
-    it("should throw MISSING_ARGUMENT error if input specifies parameter before argument", () => {
-      const input = "hello.txt -f";
-
-      expect(() => new Args("f*", parseInput(input)));
-      try {
-        new Args("f*", parseInput(input));
-      } catch (error) {
-        expect(error.code).toBe(ErrorCode.MISSING_ARGUMENT);
+    it.each<string>(["hello.txt -f", "-f", "-l -f"])(
+      "should throw MISSING_ARGUMENT error if input is %s and has argument without it's parameter",
+      (input) => {
+        expect(() => new Args("l,f*", parseInput(input)));
+        try {
+          new Args("l,f*", parseInput(input));
+        } catch (error) {
+          expect(error.code).toBe(ErrorCode.MISSING_ARGUMENT);
+        }
       }
-    });
+    );
 
     it("should throw INVALID_NUMBER error if parameter for number argument is not a valid number", () => {
       const input = "-p hello";
