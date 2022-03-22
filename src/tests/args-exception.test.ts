@@ -127,6 +127,35 @@ describe("ArgsException", () => {
       );
     });
 
+    it("should return default argumentId when code is INVALID_ARGUMENT_NAME, but no argumentId was passed in", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.INVALID_ARGUMENT_NAME,
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-\0' has invalid name.");
+    });
+
+    it("should return argumentId when code is INVALID_ARGUMENT_NAME and argumentId was passed in via constructor", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.INVALID_ARGUMENT_NAME,
+        argumentId: "0",
+      });
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-0' has invalid name.");
+    });
+
+    it("should return argumentId when code is INVALID_ARGUMENT_NAME and argumentId was passed in via setter", () => {
+      const exception = new ArgsException({
+        code: ErrorCode.INVALID_ARGUMENT_NAME,
+      });
+      exception.argumentId = "1";
+
+      const errorMessage = exception.errorMessage;
+      expect(errorMessage).toBe("Argument '-1' has invalid name.");
+    });
+
     it("should return default argumentId when code is INVALID_SCHEMA, but no argumentId was passed in", () => {
       const exception = new ArgsException({ code: ErrorCode.INVALID_SCHEMA });
 
@@ -144,7 +173,7 @@ describe("ArgsException", () => {
       expect(errorMessage).toBe("Schema 'schema' is invalid.");
     });
 
-    it("should return argumentId when code is INVALID_SCHEMA and argumentId was passed in via setters", () => {
+    it("should return argumentId when code is INVALID_SCHEMA and argumentId was passed in via setter", () => {
       const exception = new ArgsException({ code: ErrorCode.INVALID_SCHEMA });
       exception.argumentId = "test";
 

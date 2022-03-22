@@ -3,17 +3,6 @@ import { ErrorCode } from "../args-exception";
 import { parseInput } from "./test-utils";
 
 describe("Args", () => {
-  describe("constructor", () => {
-    it("should throw bad character in args error if schema has non-string arguments", () => {
-      const input = "-l";
-
-      expect(() => new Args("1", parseInput(input))).toThrowError(Error);
-      expect(() => new Args("1", parseInput(input))).toThrowError(
-        "Bad character: 1 in Args format: 1"
-      );
-    });
-  });
-
   describe(".getBoolean()", () => {
     it("should return true when argument is in schema and input arguments", () => {
       const input = "-l";
@@ -180,6 +169,17 @@ describe("Args", () => {
         new Args("", parseInput(input));
       } catch (error) {
         expect(error.code).toBe(ErrorCode.INVALID_SCHEMA);
+      }
+    });
+
+    it("should throw INVALID_ARGUMENT_NAME error if schema has non-string arguments", () => {
+      const input = "-l";
+
+      expect(() => new Args("1", parseInput(input))).toThrowError(Error);
+      try {
+        new Args("1", parseInput(input));
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.INVALID_ARGUMENT_NAME);
       }
     });
 

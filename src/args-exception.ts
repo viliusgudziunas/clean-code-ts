@@ -1,4 +1,5 @@
 export enum ErrorCode {
+  INVALID_ARGUMENT_NAME,
   INVALID_FORMAT,
   INVALID_NUMBER,
   INVALID_SCHEMA,
@@ -62,6 +63,8 @@ class ArgsException extends Error {
     switch (this.code) {
       case ErrorCode.OK:
         throw new Error("TILT: Should not get here.");
+      case ErrorCode.INVALID_ARGUMENT_NAME:
+        return `Argument '-${this.argumentId}' has invalid name.`;
       case ErrorCode.INVALID_SCHEMA:
         return `Schema '${this.argumentId}' is invalid.`;
       case ErrorCode.INVALID_FORMAT:

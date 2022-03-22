@@ -59,7 +59,8 @@ class Args {
   private validateSchemaElementId(elementId: string): void {
     if (!elementId.match(/[a-z]/i)) {
       throw new ArgsException({
-        message: `Bad character: ${elementId} in Args format: ${this.schema}`,
+        code: ErrorCode.INVALID_ARGUMENT_NAME,
+        argumentId: elementId,
       });
     }
   }
