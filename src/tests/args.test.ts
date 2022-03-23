@@ -1,5 +1,5 @@
-import Args from "../args";
-import { ErrorCode } from "../args-exception";
+import Args from "../args/args";
+import { ErrorCode } from "../args/args-exception";
 import { parseInput } from "./test-utils";
 
 describe("Args", () => {
