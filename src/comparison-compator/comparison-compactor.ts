@@ -13,7 +13,7 @@ class ComparisonCompactor {
   private contextLength: number;
   private expected: string;
   private actual: string;
-  private prefixIndex: number;
+  private prefixLength: number;
   private suffixLength: number;
 
   constructor(contextLength: number, expected: string, actual: string) {
@@ -62,8 +62,8 @@ class ComparisonCompactor {
 
   private suffixOverlapsPrefix(suffixLength: number): boolean {
     return (
-      this.actual.length - suffixLength <= this.prefixIndex ||
-      this.expected.length - suffixLength <= this.prefixIndex
+      this.actual.length - suffixLength <= this.prefixLength ||
+      this.expected.length - suffixLength <= this.prefixLength
     );
   }
 
@@ -74,10 +74,10 @@ class ComparisonCompactor {
   private findCommonPrefix(): void {
     const end = Math.min(this.expected.length, this.actual.length);
 
-    for (this.prefixIndex = 0; this.prefixIndex < end; this.prefixIndex++) {
+    for (this.prefixLength = 0; this.prefixLength < end; this.prefixLength++) {
       if (
-        this.expected.charAt(this.prefixIndex) !=
-        this.actual.charAt(this.prefixIndex)
+        this.expected.charAt(this.prefixLength) !=
+        this.actual.charAt(this.prefixLength)
       ) {
         break;
       }
@@ -88,7 +88,7 @@ class ComparisonCompactor {
     return (
       this.computeCommonPrefix() +
       ComparisonCompactor.DELTA_START +
-      source.substring(this.prefixIndex, source.length - this.suffixLength) +
+      source.substring(this.prefixLength, source.length - this.suffixLength) +
       ComparisonCompactor.DELTA_END +
       this.computeCommonSuffix()
     );
@@ -96,12 +96,12 @@ class ComparisonCompactor {
 
   private computeCommonPrefix(): string {
     return (
-      (this.prefixIndex > this.contextLength
+      (this.prefixLength > this.contextLength
         ? ComparisonCompactor.ELLIPSIS
         : "") +
       this.expected.substring(
-        Math.max(0, this.prefixIndex - this.contextLength),
-        this.prefixIndex
+        Math.max(0, this.prefixLength - this.contextLength),
+        this.prefixLength
       )
     );
   }
