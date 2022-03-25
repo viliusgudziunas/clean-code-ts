@@ -1,6 +1,6 @@
-import Args from "../args/args";
-import { ErrorCode } from "../args/args-exception";
-import { parseInput } from "./test-utils";
+import Args from "src/args/args";
+import { ErrorCode } from "src/args/args-exception";
+import { parseInput } from "../test-utils";
 
 describe("Args", () => {
   describe(".getBoolean()", () => {

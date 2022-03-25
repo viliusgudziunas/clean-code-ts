@@ -1,4 +1,4 @@
-import ArgsException, { ErrorCode } from "../args/args-exception";
+import ArgsException, { ErrorCode } from "src/args/args-exception";
 
 describe("ArgsException", () => {
   describe("constructor", () => {
