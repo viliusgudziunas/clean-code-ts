@@ -25,7 +25,7 @@ class ComparisonCompactor {
   formatCompactedComparison(message: string): string {
     let compactExpected = this.expected;
     let compactActual = this.actual;
-    if (this.canBeCompacted()) {
+    if (this.shouldBeCompacted()) {
       this.findCommonPrefixAndSuffix();
       compactExpected = this.compactString(this.expected);
       compactActual = this.compactString(this.actual);
@@ -33,9 +33,13 @@ class ComparisonCompactor {
     return Assert.format(message, compactExpected, compactActual);
   }
 
-  private canBeCompacted(): boolean {
+  private shouldBeCompacted(): boolean {
+    return !this.shouldNotBeCompacted();
+  }
+
+  private shouldNotBeCompacted(): boolean {
     return (
-      this.expected !== null && this.actual !== null && !this.areStringsEqual()
+      this.expected === null || this.actual === null || this.areStringsEqual()
     );
   }
 
