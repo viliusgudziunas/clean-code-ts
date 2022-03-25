@@ -23,21 +23,21 @@ class ComparisonCompactor {
   }
 
   compact(message: string): string {
-    if (this.shouldNotCompact()) {
-      return Assert.format(message, this.expected, this.actual);
+    if (this.canBeCompacted()) {
+      this.findCommonPrefix();
+      this.findCommonSuffix();
+      const compactExpected = this.compactString(this.expected);
+      const compactActual = this.compactString(this.actual);
+
+      return Assert.format(message, compactExpected, compactActual);
     }
 
-    this.findCommonPrefix();
-    this.findCommonSuffix();
-    const compactExpected = this.compactString(this.expected);
-    const compactActual = this.compactString(this.actual);
-
-    return Assert.format(message, compactExpected, compactActual);
+    return Assert.format(message, this.expected, this.actual);
   }
 
-  private shouldNotCompact(): boolean {
+  private canBeCompacted(): boolean {
     return (
-      this.expected === null || this.actual === null || this.areStringsEqual()
+      this.expected !== null && this.actual !== null && !this.areStringsEqual()
     );
   }
 
