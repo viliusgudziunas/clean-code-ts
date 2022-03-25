@@ -27,8 +27,8 @@ class ComparisonCompactor {
     let compactActual = this.actual;
     if (this.shouldBeCompacted()) {
       this.findCommonPrefixAndSuffix();
-      compactExpected = this.compactString(this.expected);
-      compactActual = this.compactString(this.actual);
+      compactExpected = this.compact(this.expected);
+      compactActual = this.compact(this.actual);
     }
     return Assert.format(message, compactExpected, compactActual);
   }
@@ -84,9 +84,10 @@ class ComparisonCompactor {
     }
   }
 
-  private compactString(source: string): string {
+  private compact(source: string): string {
     return (
-      this.computeCommonPrefix() +
+      this.startingEllipsis() +
+      this.startingContext() +
       ComparisonCompactor.DELTA_START +
       source.substring(this.prefixLength, source.length - this.suffixLength) +
       ComparisonCompactor.DELTA_END +
@@ -94,16 +95,16 @@ class ComparisonCompactor {
     );
   }
 
-  private computeCommonPrefix(): string {
-    return (
-      (this.prefixLength > this.contextLength
-        ? ComparisonCompactor.ELLIPSIS
-        : "") +
-      this.expected.substring(
-        Math.max(0, this.prefixLength - this.contextLength),
-        this.prefixLength
-      )
-    );
+  private startingEllipsis(): string {
+    return this.prefixLength > this.contextLength
+      ? ComparisonCompactor.ELLIPSIS
+      : "";
+  }
+
+  private startingContext(): string {
+    const contextStart = Math.max(0, this.prefixLength - this.contextLength);
+    const contextEnd = this.prefixLength;
+    return this.expected.substring(contextStart, contextEnd);
   }
 
   private computeCommonSuffix(): string {
