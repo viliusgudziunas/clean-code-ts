@@ -89,9 +89,10 @@ class ComparisonCompactor {
       this.startingEllipsis() +
       this.startingContext() +
       ComparisonCompactor.DELTA_START +
-      source.substring(this.prefixLength, source.length - this.suffixLength) +
+      this.delta(source) +
       ComparisonCompactor.DELTA_END +
-      this.computeCommonSuffix()
+      this.endingContext() +
+      this.endingEllipsis()
     );
   }
 
@@ -107,18 +108,25 @@ class ComparisonCompactor {
     return this.expected.substring(contextStart, contextEnd);
   }
 
-  private computeCommonSuffix(): string {
-    const end = Math.min(
-      this.expected.length - this.suffixLength + this.contextLength,
+  private delta(source: string): string {
+    const deltaStart = this.prefixLength;
+    const deltaEnd = source.length - this.suffixLength;
+    return source.substring(deltaStart, deltaEnd);
+  }
+
+  private endingContext(): string {
+    const contextStart = this.expected.length - this.suffixLength;
+    const contextEnd = Math.min(
+      contextStart + this.contextLength,
       this.expected.length
     );
-    return (
-      this.expected.substring(this.expected.length - this.suffixLength, end) +
-      (this.expected.length - this.suffixLength <
-      this.expected.length - this.contextLength
-        ? ComparisonCompactor.ELLIPSIS
-        : "")
-    );
+    return this.expected.substring(contextStart, contextEnd);
+  }
+
+  private endingEllipsis(): string {
+    return this.suffixLength > this.contextLength
+      ? ComparisonCompactor.ELLIPSIS
+      : "";
   }
 
   private areStringsEqual(): boolean {
