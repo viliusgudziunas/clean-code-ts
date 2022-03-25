@@ -29,10 +29,10 @@ class ComparisonCompactor {
 
     this.findCommonPrefix();
     this.findCommonSuffix();
-    const expected = this.compactString(this.expected);
-    const actual = this.compactString(this.actual);
+    const compactExpected = this.compactString(this.expected);
+    const compactActual = this.compactString(this.actual);
 
-    return Assert.format(message, expected, actual);
+    return Assert.format(message, compactExpected, compactActual);
   }
 
   private shouldNotCompact(): boolean {
