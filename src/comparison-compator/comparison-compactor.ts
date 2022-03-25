@@ -23,11 +23,7 @@ class ComparisonCompactor {
   }
 
   compact(message: string): string {
-    if (
-      this.expected === null ||
-      this.actual === null ||
-      this.areStringsEqual()
-    ) {
+    if (this.shouldNotCompact()) {
       return Assert.format(message, this.expected, this.actual);
     }
 
@@ -37,6 +33,12 @@ class ComparisonCompactor {
     const actual = this.compactString(this.actual);
 
     return Assert.format(message, expected, actual);
+  }
+
+  private shouldNotCompact(): boolean {
+    return (
+      this.expected === null || this.actual === null || this.areStringsEqual()
+    );
   }
 
   private compactString(source: string): string {
