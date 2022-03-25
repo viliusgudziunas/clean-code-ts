@@ -15,6 +15,8 @@ class ComparisonCompactor {
   private actual: string;
   private prefix: number;
   private suffix: number;
+  private compactExpected: string;
+  private compactActual: string;
 
   constructor(contextLength: number, expected: string, actual: string) {
     this.contextLength = contextLength;
@@ -22,16 +24,11 @@ class ComparisonCompactor {
     this.actual = actual;
   }
 
-  compact(message: string): string {
+  formatCompactedComparison(message: string): string {
     if (this.canBeCompacted()) {
-      this.findCommonPrefix();
-      this.findCommonSuffix();
-      const compactExpected = this.compactString(this.expected);
-      const compactActual = this.compactString(this.actual);
-
-      return Assert.format(message, compactExpected, compactActual);
+      this.compactExpectedAndActual();
+      return Assert.format(message, this.compactExpected, this.compactActual);
     }
-
     return Assert.format(message, this.expected, this.actual);
   }
 
@@ -39,6 +36,13 @@ class ComparisonCompactor {
     return (
       this.expected !== null && this.actual !== null && !this.areStringsEqual()
     );
+  }
+
+  private compactExpectedAndActual(): void {
+    this.findCommonPrefix();
+    this.findCommonSuffix();
+    this.compactExpected = this.compactString(this.expected);
+    this.compactActual = this.compactString(this.actual);
   }
 
   private compactString(source: string): string {
