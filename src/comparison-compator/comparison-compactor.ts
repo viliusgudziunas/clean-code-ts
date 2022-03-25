@@ -14,7 +14,7 @@ class ComparisonCompactor {
   private expected: string;
   private actual: string;
   private prefixIndex: number;
-  private suffixIndex: number;
+  private suffixLength: number;
   private compactExpected: string;
   private compactActual: string;
 
@@ -47,28 +47,29 @@ class ComparisonCompactor {
   private findCommonPrefixAndSuffix(): void {
     this.findCommonPrefix();
 
-    let suffixIndex = 1;
-    for (suffixIndex; !this.suffixOverlapsPrefix(suffixIndex); suffixIndex++) {
+    for (
+      this.suffixLength = 0;
+      !this.suffixOverlapsPrefix(this.suffixLength);
+      this.suffixLength++
+    ) {
       if (
-        this.charFromEnd(this.expected, suffixIndex) !=
-        this.charFromEnd(this.actual, suffixIndex)
+        this.charFromEnd(this.expected, this.suffixLength) !=
+        this.charFromEnd(this.actual, this.suffixLength)
       ) {
         break;
       }
     }
-
-    this.suffixIndex = suffixIndex;
   }
 
   private suffixOverlapsPrefix(suffixLength: number): boolean {
     return (
-      this.actual.length - suffixLength < this.prefixIndex ||
-      this.expected.length - suffixLength < this.prefixIndex
+      this.actual.length - suffixLength <= this.prefixIndex ||
+      this.expected.length - suffixLength <= this.prefixIndex
     );
   }
 
   private charFromEnd(text: string, index: number): string {
-    return text.charAt(text.length - index);
+    return text.charAt(text.length - index - 1);
   }
 
   private findCommonPrefix(): void {
@@ -87,13 +88,13 @@ class ComparisonCompactor {
   private compactString(source: string): string {
     let result =
       ComparisonCompactor.DELTA_START +
-      source.substring(this.prefixIndex, source.length - this.suffixIndex + 1) +
+      source.substring(this.prefixIndex, source.length - this.suffixLength) +
       ComparisonCompactor.DELTA_END;
 
     if (this.prefixIndex > 0) {
       result = this.computeCommonPrefix() + result;
     }
-    if (this.suffixIndex > 0) {
+    if (this.suffixLength > 0) {
       result = result + this.computeCommonSuffix();
     }
 
@@ -114,15 +115,12 @@ class ComparisonCompactor {
 
   private computeCommonSuffix(): string {
     const end = Math.min(
-      this.expected.length - this.suffixIndex + 1 + this.contextLength,
+      this.expected.length - this.suffixLength + this.contextLength,
       this.expected.length
     );
     return (
-      this.expected.substring(
-        this.expected.length - this.suffixIndex + 1,
-        end
-      ) +
-      (this.expected.length - this.suffixIndex + 1 <
+      this.expected.substring(this.expected.length - this.suffixLength, end) +
+      (this.expected.length - this.suffixLength <
       this.expected.length - this.contextLength
         ? ComparisonCompactor.ELLIPSIS
         : "")
