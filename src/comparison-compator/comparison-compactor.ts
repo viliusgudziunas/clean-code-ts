@@ -39,10 +39,44 @@ class ComparisonCompactor {
   }
 
   private compactExpectedAndActual(): void {
-    this.prefixIndex = this.findCommonPrefix();
-    this.suffixIndex = this.findCommonSuffix(this.prefixIndex);
+    this.findCommonPrefixAndSuffix();
     this.compactExpected = this.compactString(this.expected);
     this.compactActual = this.compactString(this.actual);
+  }
+
+  private findCommonPrefixAndSuffix(): void {
+    this.findCommonPrefix();
+    let expectedSuffix = this.expected.length - 1;
+    let actualSuffix = this.actual.length - 1;
+
+    while (
+      actualSuffix >= this.prefixIndex &&
+      expectedSuffix >= this.prefixIndex
+    ) {
+      if (
+        this.expected.charAt(expectedSuffix) != this.actual.charAt(actualSuffix)
+      ) {
+        break;
+      }
+
+      actualSuffix--;
+      expectedSuffix--;
+    }
+
+    this.suffixIndex = this.expected.length - expectedSuffix;
+  }
+
+  private findCommonPrefix(): void {
+    const end = Math.min(this.expected.length, this.actual.length);
+
+    for (this.prefixIndex = 0; this.prefixIndex < end; this.prefixIndex++) {
+      if (
+        this.expected.charAt(this.prefixIndex) !=
+        this.actual.charAt(this.prefixIndex)
+      ) {
+        break;
+      }
+    }
   }
 
   private compactString(source: string): string {
@@ -59,38 +93,6 @@ class ComparisonCompactor {
     }
 
     return result;
-  }
-
-  private findCommonPrefix(): number {
-    const end = Math.min(this.expected.length, this.actual.length);
-
-    let prefixIndex = 0;
-    for (prefixIndex; prefixIndex < end; prefixIndex++) {
-      if (
-        this.expected.charAt(prefixIndex) != this.actual.charAt(prefixIndex)
-      ) {
-        break;
-      }
-    }
-    return prefixIndex;
-  }
-
-  private findCommonSuffix(prefixIndex: number): number {
-    let expectedSuffix = this.expected.length - 1;
-    let actualSuffix = this.actual.length - 1;
-
-    while (actualSuffix >= prefixIndex && expectedSuffix >= prefixIndex) {
-      if (
-        this.expected.charAt(expectedSuffix) != this.actual.charAt(actualSuffix)
-      ) {
-        break;
-      }
-
-      actualSuffix--;
-      expectedSuffix--;
-    }
-
-    return this.expected.length - expectedSuffix;
   }
 
   private computeCommonPrefix(): string {
