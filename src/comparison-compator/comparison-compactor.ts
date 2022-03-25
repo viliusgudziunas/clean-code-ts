@@ -46,24 +46,29 @@ class ComparisonCompactor {
 
   private findCommonPrefixAndSuffix(): void {
     this.findCommonPrefix();
-    let expectedSuffix = this.expected.length - 1;
-    let actualSuffix = this.actual.length - 1;
 
-    while (
-      actualSuffix >= this.prefixIndex &&
-      expectedSuffix >= this.prefixIndex
-    ) {
+    let suffixIndex = 1;
+    for (suffixIndex; !this.suffixOverlapsPrefix(suffixIndex); suffixIndex++) {
       if (
-        this.expected.charAt(expectedSuffix) != this.actual.charAt(actualSuffix)
+        this.charFromEnd(this.expected, suffixIndex) !=
+        this.charFromEnd(this.actual, suffixIndex)
       ) {
         break;
       }
-
-      actualSuffix--;
-      expectedSuffix--;
     }
 
-    this.suffixIndex = this.expected.length - expectedSuffix;
+    this.suffixIndex = suffixIndex;
+  }
+
+  private suffixOverlapsPrefix(suffixLength: number): boolean {
+    return (
+      this.actual.length - suffixLength < this.prefixIndex ||
+      this.expected.length - suffixLength < this.prefixIndex
+    );
+  }
+
+  private charFromEnd(text: string, index: number): string {
+    return text.charAt(text.length - index);
   }
 
   private findCommonPrefix(): void {
