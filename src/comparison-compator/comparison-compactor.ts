@@ -40,7 +40,7 @@ class ComparisonCompactor {
 
   private compactExpectedAndActual(): void {
     this.prefixIndex = this.findCommonPrefix();
-    this.suffixIndex = this.findCommonSuffix();
+    this.suffixIndex = this.findCommonSuffix(this.prefixIndex);
     this.compactExpected = this.compactString(this.expected);
     this.compactActual = this.compactString(this.actual);
   }
@@ -75,14 +75,11 @@ class ComparisonCompactor {
     return prefixIndex;
   }
 
-  private findCommonSuffix(): number {
+  private findCommonSuffix(prefixIndex: number): number {
     let expectedSuffix = this.expected.length - 1;
     let actualSuffix = this.actual.length - 1;
 
-    while (
-      actualSuffix >= this.prefixIndex &&
-      expectedSuffix >= this.prefixIndex
-    ) {
+    while (actualSuffix >= prefixIndex && expectedSuffix >= prefixIndex) {
       if (
         this.expected.charAt(expectedSuffix) != this.actual.charAt(actualSuffix)
       ) {
