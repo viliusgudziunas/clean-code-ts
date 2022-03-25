@@ -10,31 +10,31 @@ class ComparisonCompactor {
   private static DELTA_START: string = "[";
   private static DELTA_END: string = "]";
 
-  private fContextLength: number;
-  private fExpected: string;
-  private fActual: string;
-  private fPrefix: number;
-  private fSuffix: number;
+  private contextLength: number;
+  private expected: string;
+  private actual: string;
+  private prefix: number;
+  private suffix: number;
 
   constructor(contextLength: number, expected: string, actual: string) {
-    this.fContextLength = contextLength;
-    this.fExpected = expected;
-    this.fActual = actual;
+    this.contextLength = contextLength;
+    this.expected = expected;
+    this.actual = actual;
   }
 
   compact(message: string): string {
     if (
-      this.fExpected === null ||
-      this.fActual === null ||
+      this.expected === null ||
+      this.actual === null ||
       this.areStringsEqual()
     ) {
-      return Assert.format(message, this.fExpected, this.fActual);
+      return Assert.format(message, this.expected, this.actual);
     }
 
     this.findCommonPrefix();
     this.findCommonSuffix();
-    const expected = this.compactString(this.fExpected);
-    const actual = this.compactString(this.fActual);
+    const expected = this.compactString(this.expected);
+    const actual = this.compactString(this.actual);
 
     return Assert.format(message, expected, actual);
   }
@@ -42,13 +42,13 @@ class ComparisonCompactor {
   private compactString(source: string): string {
     let result =
       ComparisonCompactor.DELTA_START +
-      source.substring(this.fPrefix, source.length - this.fSuffix + 1) +
+      source.substring(this.prefix, source.length - this.suffix + 1) +
       ComparisonCompactor.DELTA_END;
 
-    if (this.fPrefix > 0) {
+    if (this.prefix > 0) {
       result = this.computeCommonPrefix() + result;
     }
-    if (this.fSuffix > 0) {
+    if (this.suffix > 0) {
       result = result + this.computeCommonSuffix();
     }
 
@@ -56,11 +56,11 @@ class ComparisonCompactor {
   }
 
   private findCommonPrefix(): void {
-    const end = Math.min(this.fExpected.length, this.fActual.length);
+    const end = Math.min(this.expected.length, this.actual.length);
 
-    for (this.fPrefix = 0; this.fPrefix < end; this.fPrefix++) {
+    for (this.prefix = 0; this.prefix < end; this.prefix++) {
       if (
-        this.fExpected.charAt(this.fPrefix) != this.fActual.charAt(this.fPrefix)
+        this.expected.charAt(this.prefix) != this.actual.charAt(this.prefix)
       ) {
         break;
       }
@@ -68,13 +68,12 @@ class ComparisonCompactor {
   }
 
   private findCommonSuffix(): void {
-    let expectedSuffix = this.fExpected.length - 1;
-    let actualSuffix = this.fActual.length - 1;
+    let expectedSuffix = this.expected.length - 1;
+    let actualSuffix = this.actual.length - 1;
 
-    while (actualSuffix >= this.fPrefix && expectedSuffix >= this.fPrefix) {
+    while (actualSuffix >= this.prefix && expectedSuffix >= this.prefix) {
       if (
-        this.fExpected.charAt(expectedSuffix) !=
-        this.fActual.charAt(actualSuffix)
+        this.expected.charAt(expectedSuffix) != this.actual.charAt(actualSuffix)
       ) {
         break;
       }
@@ -83,35 +82,35 @@ class ComparisonCompactor {
       expectedSuffix--;
     }
 
-    this.fSuffix = this.fExpected.length - expectedSuffix;
+    this.suffix = this.expected.length - expectedSuffix;
   }
 
   private computeCommonPrefix(): string {
     return (
-      (this.fPrefix > this.fContextLength ? ComparisonCompactor.ELLIPSIS : "") +
-      this.fExpected.substring(
-        Math.max(0, this.fPrefix - this.fContextLength),
-        this.fPrefix
+      (this.prefix > this.contextLength ? ComparisonCompactor.ELLIPSIS : "") +
+      this.expected.substring(
+        Math.max(0, this.prefix - this.contextLength),
+        this.prefix
       )
     );
   }
 
   private computeCommonSuffix(): string {
     const end = Math.min(
-      this.fExpected.length - this.fSuffix + 1 + this.fContextLength,
-      this.fExpected.length
+      this.expected.length - this.suffix + 1 + this.contextLength,
+      this.expected.length
     );
     return (
-      this.fExpected.substring(this.fExpected.length - this.fSuffix + 1, end) +
-      (this.fExpected.length - this.fSuffix + 1 <
-      this.fExpected.length - this.fContextLength
+      this.expected.substring(this.expected.length - this.suffix + 1, end) +
+      (this.expected.length - this.suffix + 1 <
+      this.expected.length - this.contextLength
         ? ComparisonCompactor.ELLIPSIS
         : "")
     );
   }
 
   private areStringsEqual(): boolean {
-    return this.fExpected === this.fActual;
+    return this.expected === this.actual;
   }
 }
 
