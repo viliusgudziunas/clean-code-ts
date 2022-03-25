@@ -86,19 +86,13 @@ class ComparisonCompactor {
   }
 
   private compactString(source: string): string {
-    let result =
+    return (
+      this.computeCommonPrefix() +
       ComparisonCompactor.DELTA_START +
       source.substring(this.prefixIndex, source.length - this.suffixLength) +
-      ComparisonCompactor.DELTA_END;
-
-    if (this.prefixIndex > 0) {
-      result = this.computeCommonPrefix() + result;
-    }
-    if (this.suffixLength > 0) {
-      result = result + this.computeCommonSuffix();
-    }
-
-    return result;
+      ComparisonCompactor.DELTA_END +
+      this.computeCommonSuffix()
+    );
   }
 
   private computeCommonPrefix(): string {
