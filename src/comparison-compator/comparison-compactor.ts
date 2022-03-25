@@ -15,8 +15,6 @@ class ComparisonCompactor {
   private actual: string;
   private prefixIndex: number;
   private suffixLength: number;
-  private compactExpected: string;
-  private compactActual: string;
 
   constructor(contextLength: number, expected: string, actual: string) {
     this.contextLength = contextLength;
@@ -25,23 +23,20 @@ class ComparisonCompactor {
   }
 
   formatCompactedComparison(message: string): string {
+    let compactExpected = this.expected;
+    let compactActual = this.actual;
     if (this.canBeCompacted()) {
-      this.compactExpectedAndActual();
-      return Assert.format(message, this.compactExpected, this.compactActual);
+      this.findCommonPrefixAndSuffix();
+      compactExpected = this.compactString(this.expected);
+      compactActual = this.compactString(this.actual);
     }
-    return Assert.format(message, this.expected, this.actual);
+    return Assert.format(message, compactExpected, compactActual);
   }
 
   private canBeCompacted(): boolean {
     return (
       this.expected !== null && this.actual !== null && !this.areStringsEqual()
     );
-  }
-
-  private compactExpectedAndActual(): void {
-    this.findCommonPrefixAndSuffix();
-    this.compactExpected = this.compactString(this.expected);
-    this.compactActual = this.compactString(this.actual);
   }
 
   private findCommonPrefixAndSuffix(): void {
